@@ -1,0 +1,12 @@
+version: '3.2'
+
+services:
+  mysqldb:
+    image: mysql:latest
+    container_name: mysql_for_budget
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: budget_main_db
+
