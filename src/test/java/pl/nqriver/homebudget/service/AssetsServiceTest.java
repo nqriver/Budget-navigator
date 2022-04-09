@@ -2,14 +2,22 @@ package pl.nqriver.homebudget.service;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import pl.nqriver.homebudget.mappers.AssetsMapper;
+import pl.nqriver.homebudget.repository.AssetsRepository;
 
+@SpringBootTest
 class AssetsServiceTest {
+
+    @Autowired
+    private AssetsService assetsService;
 
     @Test
     void shouldSaveAssetAndReturnListWithOneElementIfThereWasNoSavedAssetsBefore() {
         // given
-        var assetsService = new AssetsService();
         int asset = 1;
+
         assetsService.setAsset(asset);
         // when
         var retrievedAssets = assetsService.getAllAssets();
@@ -27,13 +35,13 @@ class AssetsServiceTest {
         var assetOne = 1;
         var assetTwo = 2;
         var assetThree = 3;
-        var service = new AssetsService();
-        service.setAsset(assetOne);
-        service.setAsset(assetTwo);
-        service.setAsset(assetThree);
+
+        assetsService.setAsset(assetOne);
+        assetsService.setAsset(assetTwo);
+        assetsService.setAsset(assetThree);
 
         // when
-        var result = service.getAllAssets();
+        var result = assetsService.getAllAssets();
 
         // then
         var listOfAssets = result.getAssets();

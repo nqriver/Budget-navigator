@@ -1,13 +1,14 @@
 package pl.nqriver.homebudget.service.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+
 import java.math.BigDecimal;
-import java.util.UUID;
 
 
-@Data
+@Builder
+@Getter
 public class AssetDto {
-    private UUID id;
+    private Long id;
     private BigDecimal amount;
-
 }

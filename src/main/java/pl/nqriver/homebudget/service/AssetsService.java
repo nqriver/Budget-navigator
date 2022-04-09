@@ -2,27 +2,38 @@ package pl.nqriver.homebudget.service;
 
 
 import org.springframework.stereotype.Service;
+import pl.nqriver.homebudget.mappers.AssetsMapper;
+import pl.nqriver.homebudget.repository.AssetsRepository;
+import pl.nqriver.homebudget.repository.entities.AssetEntity;
+import pl.nqriver.homebudget.service.dto.AssetDto;
 import pl.nqriver.homebudget.service.dto.AssetsDto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 @Service
 public class AssetsService {
 
-    private AssetsDto assetsDto = new AssetsDto();
+
+    private final AssetsRepository assetsRepository;
+    private final AssetsMapper assetsMapper;
+
+    public AssetsService(AssetsRepository assetsRepository, AssetsMapper assetsMapper) {
+        this.assetsRepository = assetsRepository;
+        this.assetsMapper = assetsMapper;
+    }
 
     public AssetsDto getAllAssets() {
-        return assetsDto;
+        var allAssets = assetsRepository.findAll();
+        var assetsAmounts = allAssets.stream()
+                .map(asset -> asset.getAmount().intValue())
+                .collect(Collectors.toList());
+        return AssetsDto.builder().assets(assetsAmounts).build();
     }
 
     public void setAsset(int asset) {
-        var allAssets = assetsDto.getAssets();
-        if (allAssets == null) {
-            allAssets = new ArrayList<>();
-        }
-        allAssets.add(asset);
-        assetsDto.setAssets(allAssets);
+        var assetDto = AssetDto.builder().amount(BigDecimal.valueOf(asset)).build();
+        var assetEntity = assetsMapper.fromDtoToEntity(assetDto);
+        assetsRepository.save(assetEntity);
     }
 }
