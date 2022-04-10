@@ -1,6 +1,5 @@
 package pl.nqriver.homebudget.service;
 
-import liquibase.pro.packaged.A;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,14 +9,20 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pl.nqriver.homebudget.enums.AssetValidatorEnum;
+import pl.nqriver.homebudget.exceptions.AssetIncompleteException;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
 import pl.nqriver.homebudget.repository.entities.AssetEntity;
 import pl.nqriver.homebudget.service.dto.AssetDto;
+import pl.nqriver.homebudget.validators.AssetValidator;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -30,11 +35,14 @@ class AssetsServiceTest {
     @Autowired
     private AssetsMapper assetsMapper;
 
+    @Autowired
+    private AssetValidator assetValidator;
+
     private AssetsService assetsService;
 
     @BeforeEach
     void setUp() {
-        assetsService = new AssetsService(assetsRepository, assetsMapper);
+        assetsService = new AssetsService(assetsRepository, assetsMapper, assetValidator);
     }
 
     @Test
@@ -96,5 +104,18 @@ class AssetsServiceTest {
 
         //then
         Mockito.verify(assetsRepository, Mockito.times(1)).save(assetEntity);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenAmountInAssetDtoIsNull() {
+        //given
+        var assetDto = AssetDto.builder().build(); // no amount field set
+
+        //when
+        AssetIncompleteException result = assertThrows(AssetIncompleteException.class,
+                () -> assetsService.setAsset(assetDto));
+        //then
+        assertEquals(AssetValidatorEnum.NO_AMOUNT.getMessage(), result.getMessage());
+
     }
 }
