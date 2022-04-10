@@ -31,8 +31,7 @@ public class AssetsService {
         return AssetsDto.builder().assets(assetsAmounts).build();
     }
 
-    public void setAsset(int asset) {
-        var assetDto = AssetDto.builder().amount(BigDecimal.valueOf(asset)).build();
+    public void setAsset(AssetDto assetDto) {
         var assetEntity = assetsMapper.fromDtoToEntity(assetDto);
         assetsRepository.save(assetEntity);
     }

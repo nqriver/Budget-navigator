@@ -2,6 +2,7 @@ package pl.nqriver.homebudget.controller;
 
 import org.springframework.web.bind.annotation.*;
 import pl.nqriver.homebudget.service.AssetsService;
+import pl.nqriver.homebudget.service.dto.AssetDto;
 import pl.nqriver.homebudget.service.dto.AssetsDto;
 
 @RestController
@@ -20,8 +21,8 @@ public class AssetsController {
         return assetsService.getAllAssets();
     }
 
-    @PostMapping("/{asset}")
-    public void setAsset(@PathVariable("asset") int asset) {
-        assetsService.setAsset(asset);
+    @PostMapping
+    public void setAsset(@RequestBody AssetDto assetDto) {
+        assetsService.setAsset(assetDto);
     }
 }

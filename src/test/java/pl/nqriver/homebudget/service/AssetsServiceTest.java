@@ -1,5 +1,6 @@
 package pl.nqriver.homebudget.service;
 
+import liquibase.pro.packaged.A;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
 import pl.nqriver.homebudget.repository.entities.AssetEntity;
+import pl.nqriver.homebudget.service.dto.AssetDto;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -38,10 +40,11 @@ class AssetsServiceTest {
     @Test
     void shouldReturnListWithOneElementIfThereWasOneSavedAssetInDatabaseBefore() {
         // given
-        int asset = 1;
+        BigDecimal asset = BigDecimal.ONE;
+        AssetDto assetDto = AssetDto.builder().amount(asset).build();
 
-        assetsService.setAsset(asset);
-        AssetEntity assetEntity = AssetEntity.builder().amount(BigDecimal.valueOf(asset)).build();
+        assetsService.setAsset(assetDto);
+        AssetEntity assetEntity = AssetEntity.builder().amount(asset).build();
         List<AssetEntity> assetsList = Collections.singletonList(assetEntity);
         Mockito.when(assetsRepository.findAll()).thenReturn(assetsList);
 
@@ -52,7 +55,7 @@ class AssetsServiceTest {
         var listOfAssets = retrievedAssets.getAssets();
         Assertions.assertThat(listOfAssets)
                 .hasSize(1)
-                .containsExactly(asset);
+                .containsExactly(asset.intValue());
     }
 
     @Test
@@ -84,11 +87,12 @@ class AssetsServiceTest {
     @Test
     void shouldVerifyIfRepositorySaveWasCalledOneTime() {
         //given
-        int asset = 1;
-        var assetEntity = AssetEntity.builder().amount(BigDecimal.valueOf(asset)).build();
+        BigDecimal asset = BigDecimal.ONE;
+        var assetDto = AssetDto.builder().amount(asset).build();
+        var assetEntity = AssetEntity.builder().amount(asset).build();
 
         //when
-        assetsService.setAsset(asset);
+        assetsService.setAsset(assetDto);
 
         //then
         Mockito.verify(assetsRepository, Mockito.times(1)).save(assetEntity);
