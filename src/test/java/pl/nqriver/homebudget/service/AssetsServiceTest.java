@@ -1,28 +1,54 @@
 package pl.nqriver.homebudget.service;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
+import pl.nqriver.homebudget.repository.entities.AssetEntity;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 
 @SpringBootTest
-class AssetsServiceTest {
+@ExtendWith(MockitoExtension.class)
+class AssetsServiceTest {   
+   
+
+    @Mock
+    private AssetsRepository assetsRepository;
 
     @Autowired
+    private AssetsMapper assetsMapper;
+
     private AssetsService assetsService;
 
+    @BeforeEach
+    void setUp() {
+        assetsService = new AssetsService(assetsRepository, assetsMapper);
+    }
+
     @Test
-    void shouldSaveAssetAndReturnListWithOneElementIfThereWasNoSavedAssetsBefore() {
+    void shouldReturnListWithOneElementIfThereWasOneSavedAssetInDatabaseBefore() {
         // given
         int asset = 1;
 
         assetsService.setAsset(asset);
+        AssetEntity assetEntity = AssetEntity.builder().amount(BigDecimal.valueOf(asset)).build();
+        List<AssetEntity> assetsList = Collections.singletonList(assetEntity);
+        Mockito.when(assetsRepository.findAll()).thenReturn(assetsList);
+
         // when
         var retrievedAssets = assetsService.getAllAssets();
-        // then
 
+        // then
         var listOfAssets = retrievedAssets.getAssets();
         Assertions.assertThat(listOfAssets)
                 .hasSize(1)
@@ -30,16 +56,21 @@ class AssetsServiceTest {
     }
 
     @Test
-    void shouldSaveAssetAndReturnListWithTwoElementsIfThereWasNoSavedAssetsBefore() {
+    void shouldReturnListOfThreeIntegersIfThereWereThreeSavedAssetsInDatabaseBefore() {
         // given
-        var assetOne = 1;
-        var assetTwo = 2;
-        var assetThree = 3;
+        var assetOneAmount = 1;
+        var assetTwoAmount = 2;
+        var assetThreeAmount = 3;
 
-        assetsService.setAsset(assetOne);
-        assetsService.setAsset(assetTwo);
-        assetsService.setAsset(assetThree);
+        var assetEntityOne = AssetEntity.builder()
+                .amount(BigDecimal.valueOf(assetOneAmount)).build();
+        var assetEntityTwo = AssetEntity.builder()
+                .amount(BigDecimal.valueOf(assetTwoAmount)).build();
+        var assetEntityThree = AssetEntity.builder()
+                .amount(BigDecimal.valueOf(assetThreeAmount)).build();
 
+        List<AssetEntity> assetsList = List.of(assetEntityOne, assetEntityTwo, assetEntityThree);
+        Mockito.when(assetsRepository.findAll()).thenReturn(assetsList);
         // when
         var result = assetsService.getAllAssets();
 
@@ -47,6 +78,19 @@ class AssetsServiceTest {
         var listOfAssets = result.getAssets();
         Assertions.assertThat(listOfAssets)
                 .hasSize(3)
-                .containsExactly(assetOne, assetTwo, assetThree);
+                .containsExactly(assetOneAmount, assetTwoAmount, assetThreeAmount);
+    }
+
+    @Test
+    void shouldVerifyIfRepositorySaveWasCalledOneTime() {
+        //given
+        int asset = 1;
+        var assetEntity = AssetEntity.builder().amount(BigDecimal.valueOf(asset)).build();
+
+        //when
+        assetsService.setAsset(asset);
+
+        //then
+        Mockito.verify(assetsRepository, Mockito.times(1)).save(assetEntity);
     }
 }
