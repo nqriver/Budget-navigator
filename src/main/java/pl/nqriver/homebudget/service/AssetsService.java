@@ -1,6 +1,8 @@
 package pl.nqriver.homebudget.service;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class AssetsService {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(AssetsService.class.getName());
 
     private final AssetsRepository assetsRepository;
     private final AssetsMapper assetsMapper;
@@ -25,6 +28,7 @@ public class AssetsService {
     }
 
     public List<AssetDto> getAllAssets() {
+        LOGGER.debug("Get all assets");
         return assetsRepository.findAll()
                 .stream()
                 .map(assetsMapper::fromEntityToDto)
@@ -32,16 +36,22 @@ public class AssetsService {
     }
 
     public void setAsset(AssetDto assetDto) {
+        LOGGER.info("Set asset");
+        LOGGER.debug("AssetDto: " + assetDto);
         assetValidator.validate(assetDto);
         var assetEntity = assetsMapper.fromDtoToEntity(assetDto);
         assetsRepository.save(assetEntity);
+        LOGGER.info("Asset saved");
     }
 
     public void updateAsset(AssetDto assetDto) {
+        LOGGER.info("Update asset");
+        LOGGER.debug("AssetDto" + assetDto);
         var entity = assetsRepository.findById(assetDto.getId());
         entity.ifPresent( e -> {
             e.setAmount(assetDto.getAmount());
             assetsRepository.saveAndFlush(e);
         });
+        LOGGER.info("Asset updated");
     }
 }
