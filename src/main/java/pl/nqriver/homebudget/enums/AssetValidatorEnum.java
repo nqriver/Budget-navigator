@@ -1,7 +1,8 @@
 package pl.nqriver.homebudget.enums;
 
 public enum AssetValidatorEnum {
-    NO_AMOUNT("No amount supplied");
+    NO_AMOUNT("No amount supplied"),
+    NO_INCOME_DATE("No income date specified");
 
     private final String message;
 

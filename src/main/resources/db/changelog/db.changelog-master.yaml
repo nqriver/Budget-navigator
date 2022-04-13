@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/migration/01-assetsSchema.sql
+  - include:
+      file: db/migration/002-assetsSchemaAddIncomeDate.sql

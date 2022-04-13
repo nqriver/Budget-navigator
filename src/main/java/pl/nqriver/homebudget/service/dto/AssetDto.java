@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 
 @Builder
@@ -13,4 +14,5 @@ import java.math.BigDecimal;
 public class AssetDto {
     private Long id;
     private BigDecimal amount;
+    private Instant incomeDate;
 }

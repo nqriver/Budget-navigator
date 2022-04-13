@@ -10,6 +10,7 @@ public class AssetsMapper {
     public AssetEntity fromDtoToEntity(AssetDto assetsDto) {
         return AssetEntity.builder()
                 .amount(assetsDto.getAmount())
+                .incomeDate(assetsDto.getIncomeDate())
                 .build();
     }
 
@@ -17,6 +18,7 @@ public class AssetsMapper {
         return AssetDto.builder()
                 .id(assetEntity.getId())
                 .amount(assetEntity.getAmount())
+                .incomeDate(assetEntity.getIncomeDate())
                 .build();
     }
 }

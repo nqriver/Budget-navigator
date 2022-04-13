@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -23,5 +24,7 @@ public class AssetEntity {
     private Long id;
 
     private BigDecimal amount;
+
+    private Instant incomeDate;
 }
 
