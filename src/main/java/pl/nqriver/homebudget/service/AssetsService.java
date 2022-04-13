@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
 import pl.nqriver.homebudget.service.dto.AssetDto;
-import pl.nqriver.homebudget.service.dto.AssetsDto;
 import pl.nqriver.homebudget.validators.AssetValidator;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,17 +24,24 @@ public class AssetsService {
         this.assetValidator = assetValidator;
     }
 
-    public AssetsDto getAllAssets() {
-        var allAssets = assetsRepository.findAll();
-        var assetsAmounts = allAssets.stream()
-                .map(asset -> asset.getAmount().intValue())
+    public List<AssetDto> getAllAssets() {
+        return assetsRepository.findAll()
+                .stream()
+                .map(assetsMapper::fromEntityToDto)
                 .collect(Collectors.toList());
-        return AssetsDto.builder().assets(assetsAmounts).build();
     }
 
     public void setAsset(AssetDto assetDto) {
         assetValidator.validate(assetDto);
         var assetEntity = assetsMapper.fromDtoToEntity(assetDto);
         assetsRepository.save(assetEntity);
+    }
+
+    public void updateAsset(AssetDto assetDto) {
+        var entity = assetsRepository.findById(assetDto.getId());
+        entity.ifPresent( e -> {
+            e.setAmount(assetDto.getAmount());
+            assetsRepository.saveAndFlush(e);
+        });
     }
 }

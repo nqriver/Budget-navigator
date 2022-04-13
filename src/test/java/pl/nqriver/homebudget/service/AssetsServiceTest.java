@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.http.client.MockClientHttpRequest;
 import pl.nqriver.homebudget.enums.AssetValidatorEnum;
 import pl.nqriver.homebudget.exceptions.AssetIncompleteException;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
@@ -20,6 +21,7 @@ import pl.nqriver.homebudget.validators.AssetValidator;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -57,28 +59,27 @@ class AssetsServiceTest {
         Mockito.when(assetsRepository.findAll()).thenReturn(assetsList);
 
         // when
-        var retrievedAssets = assetsService.getAllAssets();
+        var result = assetsService.getAllAssets();
 
         // then
-        var listOfAssets = retrievedAssets.getAssets();
-        Assertions.assertThat(listOfAssets)
+        Assertions.assertThat(result)
                 .hasSize(1)
-                .containsExactly(asset.intValue());
+                .containsExactly(AssetDto.builder().amount(asset).build());
     }
 
     @Test
     void shouldReturnListOfThreeIntegersIfThereWereThreeSavedAssetsInDatabaseBefore() {
         // given
-        var assetOneAmount = 1;
-        var assetTwoAmount = 2;
-        var assetThreeAmount = 3;
+        var assetOneAmount = BigDecimal.ONE;
+        var assetTwoAmount = BigDecimal.valueOf(2);
+        var assetThreeAmount = BigDecimal.valueOf(3);
 
         var assetEntityOne = AssetEntity.builder()
-                .amount(BigDecimal.valueOf(assetOneAmount)).build();
+                .amount(assetOneAmount).build();
         var assetEntityTwo = AssetEntity.builder()
-                .amount(BigDecimal.valueOf(assetTwoAmount)).build();
+                .amount(assetTwoAmount).build();
         var assetEntityThree = AssetEntity.builder()
-                .amount(BigDecimal.valueOf(assetThreeAmount)).build();
+                .amount(assetThreeAmount).build();
 
         List<AssetEntity> assetsList = List.of(assetEntityOne, assetEntityTwo, assetEntityThree);
         Mockito.when(assetsRepository.findAll()).thenReturn(assetsList);
@@ -86,10 +87,14 @@ class AssetsServiceTest {
         var result = assetsService.getAllAssets();
 
         // then
-        var listOfAssets = result.getAssets();
-        Assertions.assertThat(listOfAssets)
+        Assertions.assertThat(result)
                 .hasSize(3)
-                .containsExactly(assetOneAmount, assetTwoAmount, assetThreeAmount);
+                .containsExactly(
+                        AssetDto.builder().amount(assetOneAmount).build(),
+                        AssetDto.builder().amount(assetTwoAmount).build(),
+                        AssetDto.builder().amount(assetThreeAmount).build()
+
+                );
     }
 
     @Test
@@ -118,4 +123,22 @@ class AssetsServiceTest {
         assertEquals(AssetValidatorEnum.NO_AMOUNT.getMessage(), result.getMessage());
 
     }
+
+    @Test
+    void shouldVerifyIfTheRepositoryUpdateWasCalled() {
+        //given
+        BigDecimal asset = BigDecimal.ONE;
+        var entity = AssetEntity.builder().amount(asset).build();
+        var assetDto = AssetDto.builder().amount(asset).build();
+
+        Mockito.when(assetsRepository.findById(Mockito.any())).thenReturn(Optional.of(entity));
+        //when
+
+        assetsService.updateAsset(assetDto);
+
+        //then
+
+        Mockito.verify(assetsRepository, Mockito.times(1)).saveAndFlush(entity);
+    }
+
 }
