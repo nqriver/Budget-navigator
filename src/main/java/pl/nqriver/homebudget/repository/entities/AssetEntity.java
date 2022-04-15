@@ -1,9 +1,11 @@
 package pl.nqriver.homebudget.repository.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.nqriver.homebudget.enums.AssetCategory;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -25,6 +27,10 @@ public class AssetEntity {
 
     private BigDecimal amount;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Instant incomeDate;
+
+    @Enumerated(EnumType.STRING)
+    private AssetCategory category;
 }
 

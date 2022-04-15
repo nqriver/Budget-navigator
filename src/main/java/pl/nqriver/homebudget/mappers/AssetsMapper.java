@@ -11,6 +11,7 @@ public class AssetsMapper {
         return AssetEntity.builder()
                 .amount(assetsDto.getAmount())
                 .incomeDate(assetsDto.getIncomeDate())
+                .category(assetsDto.getCategory())
                 .build();
     }
 
@@ -19,6 +20,7 @@ public class AssetsMapper {
                 .id(assetEntity.getId())
                 .amount(assetEntity.getAmount())
                 .incomeDate(assetEntity.getIncomeDate())
+                .category(assetEntity.getCategory())
                 .build();
     }
 }

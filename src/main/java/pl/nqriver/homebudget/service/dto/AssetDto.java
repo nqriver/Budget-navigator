@@ -3,6 +3,7 @@ package pl.nqriver.homebudget.service.dto;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import pl.nqriver.homebudget.enums.AssetCategory;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -15,4 +16,5 @@ public class AssetDto {
     private Long id;
     private BigDecimal amount;
     private Instant incomeDate;
+    private AssetCategory category;
 }
