@@ -4,6 +4,7 @@ package pl.nqriver.homebudget.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import pl.nqriver.homebudget.enums.AssetCategory;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
 import pl.nqriver.homebudget.service.dto.AssetDto;
@@ -48,10 +49,17 @@ public class AssetsService {
         LOGGER.info("Update asset");
         LOGGER.debug("AssetDto" + assetDto);
         var entity = assetsRepository.findById(assetDto.getId());
-        entity.ifPresent( e -> {
+        entity.ifPresent(e -> {
             e.setAmount(assetDto.getAmount());
             assetsRepository.saveAndFlush(e);
         });
         LOGGER.info("Asset updated");
+    }
+
+    public List<AssetDto> getAssetsByCategory(AssetCategory category) {
+        return assetsRepository.getAssetEntitiesByCategory(category)
+                .stream()
+                .map(assetsMapper::fromEntityToDto)
+                .collect(Collectors.toList());
     }
 }
