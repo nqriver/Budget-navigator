@@ -117,7 +117,8 @@ class AssetsServiceTest {
     @Test
     void shouldThrowExceptionWhenAmountInAssetDtoIsNull() {
         //given
-        var assetDto = AssetDto.builder().build(); // no amount field set
+        Instant now = Instant.now();
+        var assetDto = AssetDto.builder().incomeDate(now).build(); // no amount field set
 
         //when
         AssetIncompleteException result = assertThrows(AssetIncompleteException.class,
