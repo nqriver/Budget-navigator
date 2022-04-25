@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import pl.nqriver.homebudget.exceptions.UserAlreadyExistsException;
+import pl.nqriver.homebudget.exceptions.UserNotFoundException;
 import pl.nqriver.homebudget.mappers.UserMapper;
 import pl.nqriver.homebudget.repository.UserRepository;
 import pl.nqriver.homebudget.repository.entities.UserEntity;
@@ -32,15 +34,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         LOGGER.info("Searching user: {}", username);
         UserEntity entity = userRepository
                 .findByUsername(username)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         return new User(entity.getUsername(), entity.getPassword(), Collections.emptyList());
     }
 
     public Long saveUser(UserDetailsDto userDetailsDto) {
+        validateIfUserExists(userDetailsDto);
         var userEntity = userMapper.fromDtoToEntity(userDetailsDto);
         var savedEntity = userRepository.save(userEntity);
         LOGGER.info("User saved {}", savedEntity);
         return savedEntity.getId();
+    }
+
+    private void validateIfUserExists(UserDetailsDto userDetailsDto) {
+        if (userRepository.findByUsername(userDetailsDto.getUsername()).isPresent()) {
+            throw new UserAlreadyExistsException();
+        }
     }
 }
