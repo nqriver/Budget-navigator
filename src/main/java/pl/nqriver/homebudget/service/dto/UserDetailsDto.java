@@ -1,11 +1,13 @@
 package pl.nqriver.homebudget.service.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AuthenticationUserDto {
+@Builder
+public class UserDetailsDto {
 
     private String username;
     private String password;

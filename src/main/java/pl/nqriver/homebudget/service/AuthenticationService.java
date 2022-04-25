@@ -5,7 +5,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import pl.nqriver.homebudget.service.dto.AuthenticationJwtToken;
-import pl.nqriver.homebudget.service.dto.AuthenticationUserDto;
+import pl.nqriver.homebudget.service.dto.UserDetailsDto;
 
 
 @Service
@@ -21,12 +21,12 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationJwtToken createAuthenticationToken(AuthenticationUserDto  authenticationUserDto) {
+    public AuthenticationJwtToken createAuthenticationToken(UserDetailsDto userDetailsDto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationUserDto.getUsername(), authenticationUserDto.getPassword()
+                userDetailsDto.getUsername(), userDetailsDto.getPassword()
         ));
 
-        var userDetails = userDetailsService.loadUserByUsername(authenticationUserDto.getUsername());
+        var userDetails = userDetailsService.loadUserByUsername(userDetailsDto.getUsername());
         var jwtToken = jwtService.generateJWTToken(userDetails);
 
         return new AuthenticationJwtToken(jwtToken);
