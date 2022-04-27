@@ -27,7 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+
 @ExtendWith(MockitoExtension.class)
 class AssetsServiceTest {
 
@@ -35,17 +35,22 @@ class AssetsServiceTest {
     @Mock
     private AssetsRepository assetsRepository;
 
-    @Autowired
-    private AssetsMapper assetsMapper;
+    @Mock
+    private UserLogInfoService userLogInfoService;
 
-    @Autowired
-    private AssetValidator assetValidator;
+    private AssetsMapper assetsMapper = new AssetsMapper();
+
+    private AssetValidator assetValidator = new AssetValidator();
 
     private AssetsService assetsService;
 
     @BeforeEach
     void setUp() {
-        assetsService = new AssetsService(assetsRepository, assetsMapper, assetValidator);
+        assetsService = new AssetsService(
+                assetsRepository,
+                assetsMapper,
+                assetValidator,
+                userLogInfoService);
     }
 
     @Test

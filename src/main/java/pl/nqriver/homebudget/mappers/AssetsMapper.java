@@ -2,16 +2,18 @@ package pl.nqriver.homebudget.mappers;
 
 import org.springframework.stereotype.Component;
 import pl.nqriver.homebudget.repository.entities.AssetEntity;
+import pl.nqriver.homebudget.repository.entities.UserEntity;
 import pl.nqriver.homebudget.service.dto.AssetDto;
 
 @Component
 public class AssetsMapper {
 
-    public AssetEntity fromDtoToEntity(AssetDto assetsDto) {
+    public AssetEntity fromDtoToEntity(AssetDto assetsDto, UserEntity userEntity) {
         return AssetEntity.builder()
                 .amount(assetsDto.getAmount())
                 .incomeDate(assetsDto.getIncomeDate())
                 .category(assetsDto.getCategory())
+                .user(userEntity)
                 .build();
     }
 

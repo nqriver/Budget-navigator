@@ -32,5 +32,8 @@ public class AssetEntity {
 
     @Enumerated(EnumType.STRING)
     private AssetCategory category;
+
+    @Transient
+    private UserEntity user;
 }
 

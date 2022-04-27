@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.nqriver.homebudget.enums.AssetCategory;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
+import pl.nqriver.homebudget.repository.entities.UserEntity;
 import pl.nqriver.homebudget.service.dto.AssetDto;
 import pl.nqriver.homebudget.validators.AssetValidator;
 
@@ -21,11 +22,13 @@ public class AssetsService {
     private final AssetsRepository assetsRepository;
     private final AssetsMapper assetsMapper;
     private final AssetValidator assetValidator;
+    private final UserLogInfoService userLogInfoService;
 
-    public AssetsService(AssetsRepository assetsRepository, AssetsMapper assetsMapper, AssetValidator assetValidator) {
+    public AssetsService(AssetsRepository assetsRepository, AssetsMapper assetsMapper, AssetValidator assetValidator, UserLogInfoService userLogInfoService) {
         this.assetsRepository = assetsRepository;
         this.assetsMapper = assetsMapper;
         this.assetValidator = assetValidator;
+        this.userLogInfoService = userLogInfoService;
     }
 
     public List<AssetDto> getAllAssets() {
@@ -40,9 +43,14 @@ public class AssetsService {
         LOGGER.info("Set asset");
         LOGGER.debug("AssetDto: " + assetDto);
         assetValidator.validate(assetDto);
-        var assetEntity = assetsMapper.fromDtoToEntity(assetDto);
+        UserEntity user = getLoggedUser();
+        var assetEntity = assetsMapper.fromDtoToEntity(assetDto, user);
         assetsRepository.save(assetEntity);
         LOGGER.info("Asset saved");
+    }
+
+    private UserEntity getLoggedUser() {
+        return userLogInfoService.getLoggedUserEntity();
     }
 
     public void updateAsset(AssetDto assetDto) {
