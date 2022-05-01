@@ -7,7 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import pl.nqriver.homebudget.enums.AssetCategory;
 import pl.nqriver.homebudget.repository.AssetsRepository;
+import pl.nqriver.homebudget.repository.UserRepository;
 import pl.nqriver.homebudget.repository.entities.AssetEntity;
+import pl.nqriver.homebudget.repository.entities.UserEntity;
 import pl.nqriver.homebudget.service.AssetsService;
 import pl.nqriver.homebudget.service.dto.AssetDto;
 
@@ -18,14 +20,17 @@ import java.util.List;
 
 @SpringBootTest
 @Transactional
-@WithMockUser
+@WithMockUser(username = "user123", password = "123username")
 public class AssetServiceIntegrationTest {
 
     @Autowired
-    AssetsRepository assetsRepository;
+    private AssetsRepository assetsRepository;
 
     @Autowired
-    AssetsService assetsService;
+    private AssetsService assetsService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void shouldReturnListOfAssetsWithOneCategory() {
@@ -57,23 +62,36 @@ public class AssetServiceIntegrationTest {
         Assertions.assertThat(allAssetsInDb).hasSize(3);
     }
 
+    private UserEntity initUserInDatabase() {
+        var user = UserEntity.builder()
+                .username("user123")
+                .password("123user")
+                .build();
+        return userRepository.save(user);
+    }
+
+
     private void initDatabase() {
+        UserEntity userEntity = initUserInDatabase();
         AssetEntity assetEntityOne = AssetEntity.builder()
                 .amount(BigDecimal.ONE)
                 .incomeDate(Instant.now())
                 .category(AssetCategory.OTHER)
+                .user(userEntity)
                 .build();
         AssetEntity assetEntityTwo = AssetEntity
                 .builder()
                 .amount(BigDecimal.TEN)
                 .incomeDate(Instant.now())
                 .category(AssetCategory.LOAN_RETURNED)
+                .user(userEntity)
                 .build();
         AssetEntity assetEntityThree = AssetEntity
                 .builder()
                 .amount(BigDecimal.TEN)
                 .incomeDate(Instant.now())
                 .category(AssetCategory.OTHER)
+                .user(userEntity)
                 .build();
 
         assetsRepository.saveAll(List.of(

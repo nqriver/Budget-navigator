@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/migration/003-assetsSchemaAddCategory.sql
   - include:
       file: db/migration/004-userSchema.sql
+  - include:
+      file: db/migration/005-assetsSchemaAddUserId.sql

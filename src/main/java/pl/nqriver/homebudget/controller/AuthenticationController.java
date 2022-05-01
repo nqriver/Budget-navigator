@@ -1,6 +1,5 @@
 package pl.nqriver.homebudget.controller;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import pl.nqriver.homebudget.service.AuthenticationService;
 import pl.nqriver.homebudget.service.UserDetailsServiceImpl;

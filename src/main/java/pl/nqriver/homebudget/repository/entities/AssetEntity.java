@@ -33,7 +33,7 @@ public class AssetEntity {
     @Enumerated(EnumType.STRING)
     private AssetCategory category;
 
-    @Transient
+    @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 }
 

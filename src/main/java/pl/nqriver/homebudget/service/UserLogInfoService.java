@@ -1,6 +1,7 @@
 package pl.nqriver.homebudget.service;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import pl.nqriver.homebudget.exceptions.UserNotFoundException;
 import pl.nqriver.homebudget.repository.UserRepository;
@@ -18,11 +19,8 @@ public class UserLogInfoService {
 
     public UserEntity getLoggedUserEntity() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var username = authentication.getPrincipal();
-        return UserEntity.builder()
-                .id(23L)
-                .build();
-//        return userRepository.findByUsername(username)
-//                .orElseThrow(UserNotFoundException::new);
+        var username = ((User)authentication.getPrincipal()).getUsername();
+        return userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
     }
 }
