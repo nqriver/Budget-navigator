@@ -1,9 +1,13 @@
 package pl.nqriver.homebudget.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import pl.nqriver.homebudget.exceptions.InvalidUsernameOrPasswordException;
 import pl.nqriver.homebudget.service.dto.AuthenticationJwtToken;
 import pl.nqriver.homebudget.service.dto.UserDetailsDto;
 
@@ -22,9 +26,13 @@ public class AuthenticationService {
     }
 
     public AuthenticationJwtToken createAuthenticationToken(UserDetailsDto userDetailsDto) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                userDetailsDto.getUsername(), userDetailsDto.getPassword()
-        ));
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    userDetailsDto.getUsername(), userDetailsDto.getPassword()
+            ));
+        } catch (BadCredentialsException | InternalAuthenticationServiceException e) {
+            throw new InvalidUsernameOrPasswordException();
+        }
 
         var userDetails = userDetailsService.loadUserByUsername(userDetailsDto.getUsername());
         var jwtToken = jwtService.generateJWTToken(userDetails);
