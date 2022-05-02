@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -63,7 +64,7 @@ class AssetsServiceTest {
         assetsService.setAsset(assetDto);
         AssetEntity assetEntity = AssetEntity.builder().amount(asset).incomeDate(now).build();
         List<AssetEntity> assetsList = Collections.singletonList(assetEntity);
-        Mockito.when(assetsRepository.findAll()).thenReturn(assetsList);
+        Mockito.when(assetsRepository.getAssetEntitiesByUser(any())).thenReturn(assetsList);
 
         // when
         var result = assetsService.getAllAssets();
@@ -89,7 +90,7 @@ class AssetsServiceTest {
                 .amount(assetThreeAmount).build();
 
         List<AssetEntity> assetsList = List.of(assetEntityOne, assetEntityTwo, assetEntityThree);
-        Mockito.when(assetsRepository.findAll()).thenReturn(assetsList);
+        Mockito.when(assetsRepository.getAssetEntitiesByUser(any())).thenReturn(assetsList);
         // when
         var result = assetsService.getAllAssets();
 
@@ -140,7 +141,7 @@ class AssetsServiceTest {
         var entity = AssetEntity.builder().amount(asset).build();
         var assetDto = AssetDto.builder().amount(asset).build();
 
-        Mockito.when(assetsRepository.findById(Mockito.any())).thenReturn(Optional.of(entity));
+        Mockito.when(assetsRepository.findById(any())).thenReturn(Optional.of(entity));
         //when
 
         assetsService.updateAsset(assetDto);
