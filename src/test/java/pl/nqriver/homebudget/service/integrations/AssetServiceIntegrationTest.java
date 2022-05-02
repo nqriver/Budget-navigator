@@ -35,7 +35,7 @@ public class AssetServiceIntegrationTest {
     @Test
     void shouldReturnListOfAssetsWithOneCategory() {
         //given
-        initDatabase();
+        initDatabaseWithDefaultMockUser();
         var category = AssetCategory.OTHER;
 
         //when
@@ -53,16 +53,17 @@ public class AssetServiceIntegrationTest {
     @Test
     void shouldReturnListWhitThreeElements() {
         //given
-        initDatabase();
+        initDatabaseWithDefaultMockUser();
+        initDatabaseWithSecondMockUser();
 
         //when
-        List<AssetDto> allAssetsInDb = assetsService.getAllAssets();
+        List<AssetDto> allAssetsOfLoggedUser = assetsService.getAllAssets();
 
         //then
-        Assertions.assertThat(allAssetsInDb).hasSize(3);
+        Assertions.assertThat(allAssetsOfLoggedUser).hasSize(3);
     }
 
-    private UserEntity initUserInDatabase() {
+    private UserEntity initDefaultMockUser() {
         var user = UserEntity.builder()
                 .username("user123")
                 .password("123user")
@@ -71,8 +72,47 @@ public class AssetServiceIntegrationTest {
     }
 
 
-    private void initDatabase() {
-        UserEntity userEntity = initUserInDatabase();
+    private void initDatabaseWithDefaultMockUser() {
+        UserEntity userEntity = initDefaultMockUser();
+        AssetEntity assetEntityOne = AssetEntity.builder()
+                .amount(BigDecimal.ONE)
+                .incomeDate(Instant.now())
+                .category(AssetCategory.OTHER)
+                .user(userEntity)
+                .build();
+        AssetEntity assetEntityTwo = AssetEntity
+                .builder()
+                .amount(BigDecimal.TEN)
+                .incomeDate(Instant.now())
+                .category(AssetCategory.LOAN_RETURNED)
+                .user(userEntity)
+                .build();
+        AssetEntity assetEntityThree = AssetEntity
+                .builder()
+                .amount(BigDecimal.TEN)
+                .incomeDate(Instant.now())
+                .category(AssetCategory.OTHER)
+                .user(userEntity)
+                .build();
+
+        assetsRepository.saveAll(List.of(
+                assetEntityOne,
+                assetEntityTwo,
+                assetEntityThree
+        ));
+    }
+
+    private UserEntity initSecondMockUserInDatabase() {
+        var user = UserEntity.builder()
+                .username("user12345")
+                .password("12345user")
+                .build();
+        return userRepository.save(user);
+    }
+
+
+    private void initDatabaseWithSecondMockUser() {
+        UserEntity userEntity = initSecondMockUserInDatabase();
         AssetEntity assetEntityOne = AssetEntity.builder()
                 .amount(BigDecimal.ONE)
                 .incomeDate(Instant.now())

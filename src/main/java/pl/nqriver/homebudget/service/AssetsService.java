@@ -33,7 +33,8 @@ public class AssetsService {
 
     public List<AssetDto> getAllAssets() {
         LOGGER.debug("Get all assets");
-        return assetsRepository.findAll()
+        UserEntity loggedUser = getLoggedUser();
+        return assetsRepository.getAssetEntitiesByUser(loggedUser)
                 .stream()
                 .map(assetsMapper::fromEntityToDto)
                 .collect(Collectors.toList());
@@ -50,6 +51,7 @@ public class AssetsService {
     }
 
     private UserEntity getLoggedUser() {
+        LOGGER.info("Getting logged user");
         return userLogInfoService.getLoggedUserEntity();
     }
 
@@ -65,6 +67,7 @@ public class AssetsService {
     }
 
     public List<AssetDto> getAssetsByCategory(AssetCategory category) {
+        LOGGER.info("Getting assets by category");
         return assetsRepository.getAssetEntitiesByCategory(category)
                 .stream()
                 .map(assetsMapper::fromEntityToDto)
