@@ -16,13 +16,19 @@ import pl.nqriver.homebudget.service.dto.AssetDto;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @SpringBootTest
 @Transactional
 @WithMockUser(username = "user123", password = "123username")
 public class AssetServiceIntegrationTest {
 
+    public static final String FIRST_USERNAME = "user12345";
+    public static final String SECOND_USERNAME = "user123";
     @Autowired
     private AssetsRepository assetsRepository;
 
@@ -65,12 +71,44 @@ public class AssetServiceIntegrationTest {
 
     private UserEntity initDefaultMockUser() {
         var user = UserEntity.builder()
-                .username("user123")
+                .username(FIRST_USERNAME)
                 .password("123user")
                 .build();
         return userRepository.save(user);
     }
 
+
+    @Test
+    void shouldDeleteAllAssetsOfUser() {
+        // given
+        initDatabaseWithDefaultMockUser();
+        initDatabaseWithSecondMockUser();
+
+        var userWithRemovedAssets = userRepository.findByUsername(FIRST_USERNAME).get();
+        var userWithRetainedAssets = userRepository.findByUsername(SECOND_USERNAME).get();
+        var numberOfAllAssetsToRemove = assetsRepository.getAssetEntitiesByUser(userWithRemovedAssets).size();
+        var numberOfAllAssetsBeforeRemove = assetsRepository.findAll().size();
+        var expectedNumberOfRemainedAssets = numberOfAllAssetsBeforeRemove - numberOfAllAssetsToRemove;
+
+        // when
+        assetsService.deleteAssetsByUser(userWithRemovedAssets);
+
+        var remainedAssets = assetsRepository.findAll();
+
+        // then
+        Assertions.assertThat(remainedAssets)
+                .hasSize(expectedNumberOfRemainedAssets);
+
+        Set<UserEntity> ownersOfRemainedAssets = remainedAssets.stream()
+                .map(AssetEntity::getUser)
+                .collect(Collectors.toSet());
+
+        Assertions.assertThat(ownersOfRemainedAssets)
+                .isNotNull()
+                .hasSize(1)
+                .isEqualTo(Collections.singleton(userWithRetainedAssets));
+
+    }
 
     private void initDatabaseWithDefaultMockUser() {
         UserEntity userEntity = initDefaultMockUser();
@@ -104,7 +142,7 @@ public class AssetServiceIntegrationTest {
 
     private UserEntity initSecondMockUserInDatabase() {
         var user = UserEntity.builder()
-                .username("user12345")
+                .username(SECOND_USERNAME)
                 .password("12345user")
                 .build();
         return userRepository.save(user);

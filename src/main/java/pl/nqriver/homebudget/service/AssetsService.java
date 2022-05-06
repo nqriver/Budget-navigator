@@ -9,6 +9,7 @@ import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repository.AssetsRepository;
 import pl.nqriver.homebudget.repository.entities.UserEntity;
 import pl.nqriver.homebudget.service.dto.AssetDto;
+import pl.nqriver.homebudget.service.dto.UserDetailsDto;
 import pl.nqriver.homebudget.validators.AssetValidator;
 
 import java.util.List;
@@ -72,5 +73,9 @@ public class AssetsService {
                 .stream()
                 .map(assetsMapper::fromEntityToDto)
                 .collect(Collectors.toList());
+    }
+
+    public void deleteAssetsByUser(UserEntity user) {
+        assetsRepository.deleteAssetEntitiesByUser(user);
     }
 }

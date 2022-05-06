@@ -15,4 +15,6 @@ public interface AssetsRepository extends JpaRepository<AssetEntity, Long> {
 
     @Query("SELECT a FROM AssetEntity a WHERE a.user = :user")
     List<AssetEntity> getAssetEntitiesByUser(UserEntity user);
+
+    void deleteAssetEntitiesByUser(UserEntity userEntity);
 }
