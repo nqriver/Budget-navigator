@@ -14,6 +14,7 @@ import pl.nqriver.homebudget.repository.UserRepository;
 import pl.nqriver.homebudget.repository.entities.UserEntity;
 import pl.nqriver.homebudget.service.dto.UserDetailsDto;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
 
 @Service
@@ -23,10 +24,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsServiceImpl.class.getName());
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserLogInfoService userLogInfoService;
+    private final AssetsService assetService;
 
-    public UserDetailsServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserDetailsServiceImpl(UserRepository userRepository, UserMapper userMapper, UserLogInfoService userLogInfoService, AssetsService assetService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.userLogInfoService = userLogInfoService;
+        this.assetService = assetService;
     }
 
     @Override
@@ -51,5 +56,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userRepository.findByUsername(userDetailsDto.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException();
         }
+    }
+
+    @Transactional
+    public void deleteUser() {
+        UserEntity loggedUserEntity = userLogInfoService.getLoggedUserEntity();
+        assetService.deleteAssetsByUser(loggedUserEntity);
+        userRepository.delete(loggedUserEntity);
     }
 }

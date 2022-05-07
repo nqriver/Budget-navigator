@@ -8,6 +8,6 @@ import pl.nqriver.homebudget.repository.entities.UserEntity;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<UserEntity, Long> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByUsername(String username);
 }

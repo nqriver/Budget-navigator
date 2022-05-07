@@ -29,4 +29,9 @@ public class AuthenticationController {
         return userDetailsService.saveUser(userDetailsDto);
 
     }
+
+    @DeleteMapping
+    public void deleteUser() {
+        userDetailsService.deleteUser();
+    }
 }
