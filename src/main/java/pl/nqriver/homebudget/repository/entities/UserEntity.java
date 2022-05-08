@@ -1,18 +1,16 @@
 package pl.nqriver.homebudget.repository.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
-@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Getter
+@ToString
 public class UserEntity {
 
     @Id

@@ -1,17 +1,14 @@
 package pl.nqriver.homebudget.service.dto;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import pl.nqriver.homebudget.enums.AssetCategory;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
-
 @Builder
-@Getter
-@EqualsAndHashCode
+@Data
 public class AssetDto {
     private Long id;
     private BigDecimal amount;
