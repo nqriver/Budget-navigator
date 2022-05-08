@@ -2,7 +2,7 @@ package pl.nqriver.homebudget.validators;
 
 import org.springframework.stereotype.Component;
 import pl.nqriver.homebudget.exceptions.AssetIncompleteException;
-import pl.nqriver.homebudget.service.dto.AssetDto;
+import pl.nqriver.homebudget.services.dtos.AssetDto;
 
 @Component
 public class AssetValidator {

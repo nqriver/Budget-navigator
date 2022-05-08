@@ -1,6 +1,6 @@
 package pl.nqriver.homebudget.validators;
 
-import pl.nqriver.homebudget.service.dto.AssetDto;
+import pl.nqriver.homebudget.services.dtos.AssetDto;
 
 public interface Validator {
 

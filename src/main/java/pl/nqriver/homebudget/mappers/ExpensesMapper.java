@@ -1,10 +1,9 @@
 package pl.nqriver.homebudget.mappers;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-import pl.nqriver.homebudget.repository.entities.ExpenseEntity;
-import pl.nqriver.homebudget.repository.entities.UserEntity;
-import pl.nqriver.homebudget.service.dto.ExpenseDto;
+import pl.nqriver.homebudget.repositories.entities.ExpenseEntity;
+import pl.nqriver.homebudget.repositories.entities.UserEntity;
+import pl.nqriver.homebudget.services.dtos.ExpenseDto;
 
 import java.util.List;
 import java.util.stream.Collectors;

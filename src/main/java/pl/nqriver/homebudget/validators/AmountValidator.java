@@ -1,7 +1,7 @@
 package pl.nqriver.homebudget.validators;
 
 import pl.nqriver.homebudget.enums.AssetValidatorEnum;
-import pl.nqriver.homebudget.service.dto.AssetDto;
+import pl.nqriver.homebudget.services.dtos.AssetDto;
 
 import java.util.Objects;
 

@@ -1,9 +1,9 @@
 package pl.nqriver.homebudget.mappers;
 
 import org.springframework.stereotype.Component;
-import pl.nqriver.homebudget.repository.entities.AssetEntity;
-import pl.nqriver.homebudget.repository.entities.UserEntity;
-import pl.nqriver.homebudget.service.dto.AssetDto;
+import pl.nqriver.homebudget.repositories.entities.AssetEntity;
+import pl.nqriver.homebudget.repositories.entities.UserEntity;
+import pl.nqriver.homebudget.services.dtos.AssetDto;
 
 @Component
 public class AssetsMapper {

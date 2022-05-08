@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
-import pl.nqriver.homebudget.service.JWTService;
+import pl.nqriver.homebudget.services.JWTService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
