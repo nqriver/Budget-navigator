@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/migration/004-userSchema.sql
   - include:
       file: db/migration/005-assetsSchemaAddUserId.sql
+  - include:
+      file: db/migration/006-expensesSchema.sql
