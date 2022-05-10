@@ -22,8 +22,18 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public void setExpense(@RequestBody ExpenseDto expenseDto) {
-        expenseService.setExpense(expenseDto);
+    public ExpenseDto setExpense(@RequestBody ExpenseDto expenseDto) {
+        return expenseService.setExpense(expenseDto);
+    }
+
+    @PutMapping
+    public ExpenseDto updateExpense(@RequestBody ExpenseDto expenseDto) {
+        return expenseService.updateExpense(expenseDto);
+    }
+
+    @DeleteMapping
+    public void deleteExpense(@RequestBody ExpenseDto expenseDto) {
+        expenseService.deleteExpense(expenseDto);
     }
 
 }
