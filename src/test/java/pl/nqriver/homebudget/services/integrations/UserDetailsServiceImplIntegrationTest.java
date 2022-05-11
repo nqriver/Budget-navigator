@@ -1,23 +1,14 @@
 package pl.nqriver.homebudget.services.integrations;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.test.context.support.WithMockUser;
 import pl.nqriver.homebudget.enums.AssetCategory;
 import pl.nqriver.homebudget.enums.AuthenticationMessageEnum;
 import pl.nqriver.homebudget.exceptions.UserAlreadyExistsException;
 import pl.nqriver.homebudget.exceptions.UserNotFoundException;
-import pl.nqriver.homebudget.repositories.AssetsRepository;
-import pl.nqriver.homebudget.repositories.UserRepository;
 import pl.nqriver.homebudget.repositories.entities.AssetEntity;
 import pl.nqriver.homebudget.repositories.entities.UserEntity;
-import pl.nqriver.homebudget.services.AssetsService;
-import pl.nqriver.homebudget.services.UserDetailsServiceImpl;
 import pl.nqriver.homebudget.services.dtos.UserDetailsDto;
-
-import javax.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -26,48 +17,29 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
-@WithMockUser(username = "username", password = "pass")
-public class UserDetailsServiceImplIntegrationTest {
-
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private AssetsService assetsService;
-
-    @Autowired
-    private AssetsRepository assetsRepository;
-
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "pass";
+public class UserDetailsServiceImplIntegrationTest extends IntegrationTestDatabaseInitializer {
 
 
     @Test
     void shouldLoadExistingUser() {
         //given
-        initDatabaseWithOneUser();
+        initDefaultUserInDatabase();
 
         //when
-        UserDetails userDetails = userDetailsService.loadUserByUsername(USERNAME);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(FIRST_USERNAME);
 
         //then
-        assertThat(userDetails.getUsername()).isEqualTo(USERNAME);
-        assertThat(userDetails.getPassword()).isEqualTo(PASSWORD);
+        assertThat(userDetails.getUsername()).isEqualTo(FIRST_USERNAME);
+        assertThat(userDetails.getPassword()).isEqualTo(FIRST_USER_PASSWORD);
     }
 
     @Test
     void shouldThrowExceptionCreatingUserIfUserAlreadyExistsInDatabase() {
         //given
-        initDatabaseWithOneUser();
+        initDefaultUserInDatabase();
         UserDetailsDto userDetailsDto = UserDetailsDto.builder()
-                .username(USERNAME)
-                .password(PASSWORD)
+                .username(FIRST_USERNAME)
+                .password(FIRST_USER_PASSWORD)
                 .build();
 
         //when //then
@@ -90,7 +62,7 @@ public class UserDetailsServiceImplIntegrationTest {
     @Test
     void shouldDeleteUserWithoutAssetsFromDatabase() {
         //given
-        initDatabaseWithOneUser();
+        initDefaultUserInDatabase();
         var numberOfUsersInDatabase = userRepository.findAll().size();
 
         List<UserEntity> usersInDatabaseBeforeDelete = userRepository.findAll();
@@ -108,7 +80,7 @@ public class UserDetailsServiceImplIntegrationTest {
     @Test
     void shouldDeleteUserWithOneAssetFromDatabase() {
         // given
-        UserEntity user = initDatabaseWithOneUser();
+        UserEntity user = initDefaultUserInDatabase();
         initDatabaseWithAssetForUser(user);
 
         List<AssetEntity> assetsInDatabaseBeforeDelete = assetsRepository.findAll();
@@ -130,14 +102,6 @@ public class UserDetailsServiceImplIntegrationTest {
         assertThat(usersInDatabaseAfterDelete).hasSize(0);
 
 
-    }
-
-    UserEntity initDatabaseWithOneUser() {
-        UserEntity userEntity = UserEntity.builder()
-                .username(USERNAME)
-                .password(PASSWORD)
-                .build();
-        return userRepository.save(userEntity);
     }
 
     void initDatabaseWithAssetForUser(UserEntity userEntity) {
