@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.nqriver.homebudget.enums.AssetCategory;
 import pl.nqriver.homebudget.enums.AssetValidatorEnum;
 import pl.nqriver.homebudget.exceptions.AssetIncompleteException;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
