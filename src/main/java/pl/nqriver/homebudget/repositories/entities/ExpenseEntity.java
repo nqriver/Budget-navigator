@@ -6,6 +6,7 @@ import pl.nqriver.homebudget.enums.ExpenseCategory;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -25,7 +26,7 @@ public class ExpenseEntity {
     private BigDecimal amount;
 
     @Column(name = "date")
-    private Instant expenseDate;
+    private LocalDateTime expenseDate;
 
     @Enumerated(EnumType.STRING)
     private ExpenseCategory category;

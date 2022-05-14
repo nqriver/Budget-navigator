@@ -6,12 +6,13 @@ import pl.nqriver.homebudget.enums.ExpenseCategory;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 public class ExpenseDto {
     private Long id;
     private BigDecimal amount;
-    private Instant expenseDate;
+    private LocalDateTime expenseDate;
     private ExpenseCategory category;
 }

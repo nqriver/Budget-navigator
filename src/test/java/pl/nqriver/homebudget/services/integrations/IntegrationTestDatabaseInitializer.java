@@ -19,6 +19,7 @@ import pl.nqriver.homebudget.services.UserDetailsServiceImpl;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -68,25 +69,23 @@ public abstract class IntegrationTestDatabaseInitializer {
         var expense = ExpenseEntity.builder()
                 .amount(BigDecimal.ONE)
                 .category(ExpenseCategory.INSURANCE)
-                .expenseDate(Instant.now())
+                .expenseDate(LocalDateTime.now())
                 .user(userEntity)
                 .build();
         return expenseRepository.save(expense);
     }
 
-    protected ExpenseEntity initExpenseOfUserWithDate(UserEntity userEntity, String date) {
-        final String dateSuffix = "T00:00:00.001Z";
-        var dateInstant = Instant.parse(date + dateSuffix);
+    protected ExpenseEntity initExpenseOfUserWithDate(UserEntity userEntity, LocalDateTime dateTime) {
         var expense = ExpenseEntity.builder()
                 .amount(BigDecimal.ONE)
                 .category(ExpenseCategory.INSURANCE)
-                .expenseDate(dateInstant)
+                .expenseDate(dateTime)
                 .user(userEntity)
                 .build();
         return expenseRepository.save(expense);
     }
 
-    void initExpensesWithUserAndDates(UserEntity userEntity, List<String> dates) {
+    void initExpensesWithUserAndDates(UserEntity userEntity, List<LocalDateTime> dates) {
         dates.forEach(e -> initExpenseOfUserWithDate(userEntity, e));
     }
 

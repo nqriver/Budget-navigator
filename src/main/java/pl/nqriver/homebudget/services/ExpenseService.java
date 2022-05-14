@@ -8,15 +8,15 @@ import pl.nqriver.homebudget.repositories.entities.UserEntity;
 import pl.nqriver.homebudget.services.dtos.ExpenseDto;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
-    public static final String FROM_DATE_SUFIX = "T00:00:00.001Z";
-    public static final String TO_DATE_SUFIX = "T00:23:59.999Z";
+    public static final String FROM_DATE_SUFIX = "T00:00:00";
+    public static final String TO_DATE_SUFIX = "T23:59:59";
 
     private final ExpensesMapper expensesMapper;
     private final ExpenseRepository expenseRepository;
@@ -69,8 +69,8 @@ public class ExpenseService {
 
     public List<ExpenseDto> findAllBetweenDates(String fromDate, String toDate) {
         UserEntity loggedUserEntity = userLogInfoService.getLoggedUserEntity();
-        Instant from = Instant.parse(fromDate + FROM_DATE_SUFIX);
-        Instant to = Instant.parse(toDate + TO_DATE_SUFIX);
+        LocalDateTime from = LocalDateTime.parse(fromDate + FROM_DATE_SUFIX);
+        LocalDateTime to = LocalDateTime.parse(toDate + TO_DATE_SUFIX);
         return expenseRepository.getAllByUserAndExpenseDateBetween(loggedUserEntity, from, to)
                 .stream()
                 .map(expensesMapper::fromEntityToDto)
