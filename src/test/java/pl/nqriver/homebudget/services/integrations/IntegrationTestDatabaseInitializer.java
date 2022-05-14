@@ -74,6 +74,22 @@ public abstract class IntegrationTestDatabaseInitializer {
         return expenseRepository.save(expense);
     }
 
+    protected ExpenseEntity initExpenseOfUserWithDate(UserEntity userEntity, String date) {
+        final String dateSuffix = "T00:00:00.001Z";
+        var dateInstant = Instant.parse(date + dateSuffix);
+        var expense = ExpenseEntity.builder()
+                .amount(BigDecimal.ONE)
+                .category(ExpenseCategory.INSURANCE)
+                .expenseDate(dateInstant)
+                .user(userEntity)
+                .build();
+        return expenseRepository.save(expense);
+    }
+
+    void initExpensesWithUserAndDates(UserEntity userEntity, List<String> dates) {
+        dates.forEach(e -> initExpenseOfUserWithDate(userEntity, e));
+    }
+
     protected void initDatabaseWithDefaultUserAndAssets() {
         UserEntity userEntity = initDefaultUserInDatabase();
         AssetEntity assetEntityOne = AssetEntity.builder()

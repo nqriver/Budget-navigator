@@ -10,6 +10,7 @@ import pl.nqriver.homebudget.services.dtos.ExpenseDto;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,6 +19,34 @@ public class ExpenseServiceIntegrationTest extends IntegrationTestDatabaseInitia
 
     @Autowired
     ExpensesMapper expensesMapper;
+
+    @Test
+    void getAllExpensesBetweenDates() {
+        // given
+        String fromDate = "2022-05-03";
+        String toDate = "2022-05-14";
+        String inRangeDate = "2022-05-06";
+        String notInRangeDate = "2022-05-01";
+
+        var user = initDefaultUserInDatabase();
+        initExpensesWithUserAndDates(
+                user,
+                List.of(fromDate, toDate, inRangeDate, notInRangeDate));
+        // when
+
+        List<ExpenseDto> result = expenseService.findAllBetweenDates(fromDate, toDate);
+
+        // then
+        assertThat(result).hasSize(3);
+        List<String> resultDates = result.stream()
+                .map(ExpenseDto::getExpenseDate)
+                .map(e -> e.toString().substring(0, fromDate.length()))
+                .collect(Collectors.toList());
+
+        assertThat(resultDates).hasSize(3)
+                .containsExactly(fromDate, toDate, inRangeDate)
+                .doesNotContain(notInRangeDate);
+    }
 
     @Test
     void shouldSaveOneExpenseToDb() {
