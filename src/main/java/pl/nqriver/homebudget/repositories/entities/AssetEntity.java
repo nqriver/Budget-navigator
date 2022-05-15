@@ -6,6 +6,7 @@ import pl.nqriver.homebudget.enums.AssetCategory;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "assets")
@@ -31,5 +32,18 @@ public class AssetEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
     private UserEntity user;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssetEntity that = (AssetEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
 

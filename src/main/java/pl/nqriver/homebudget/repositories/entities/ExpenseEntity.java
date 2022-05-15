@@ -5,7 +5,6 @@ import pl.nqriver.homebudget.enums.ExpenseCategory;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
