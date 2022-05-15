@@ -1,5 +1,6 @@
 package pl.nqriver.homebudget.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import pl.nqriver.homebudget.enums.AssetCategory;
 import pl.nqriver.homebudget.enums.AssetValidatorEnum;
 import pl.nqriver.homebudget.exceptions.AssetIncompleteException;
@@ -14,7 +17,6 @@ import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.repositories.AssetsRepository;
 import pl.nqriver.homebudget.repositories.entities.AssetEntity;
 import pl.nqriver.homebudget.services.dtos.AssetDto;
-import pl.nqriver.homebudget.validators.AssetValidator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -28,9 +30,8 @@ import static org.mockito.ArgumentMatchers.any;
 
 
 @ExtendWith(MockitoExtension.class)
+@WithMockUser
 class AssetsServiceTest {
-
-
     @Mock
     private AssetsRepository assetsRepository;
 
@@ -39,7 +40,7 @@ class AssetsServiceTest {
 
     private AssetsMapper assetsMapper = new AssetsMapper();
 
-    private AssetValidator assetValidator = new AssetValidator();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     private AssetsService assetsService;
 
@@ -48,7 +49,6 @@ class AssetsServiceTest {
         assetsService = new AssetsService(
                 assetsRepository,
                 assetsMapper,
-                assetValidator,
                 userLogInfoService);
     }
 
@@ -57,20 +57,31 @@ class AssetsServiceTest {
         // given
         BigDecimal asset = BigDecimal.ONE;
         Instant now = Instant.now();
-        AssetDto assetDto = AssetDto.builder().amount(asset).incomeDate(now).build();
+        AssetDto assetDto = AssetDto
+                .builder()
+                .amount(asset)
+                .incomeDate(now)
+                .category(AssetCategory.BONUS)
+                .build();
+        AssetEntity assetEntity = AssetEntity
+                .builder()
+                .amount(asset)
+                .incomeDate(now)
+                .category(AssetCategory.BONUS)
+                .build();
 
-        assetsService.setAsset(assetDto);
-        AssetEntity assetEntity = AssetEntity.builder().amount(asset).incomeDate(now).build();
         List<AssetEntity> assetsList = Collections.singletonList(assetEntity);
+        Mockito.when(assetsRepository.save(any())).thenReturn(assetEntity);
         Mockito.when(assetsRepository.getAssetEntitiesByUser(any())).thenReturn(assetsList);
 
         // when
+        assetsService.setAsset(assetDto);
         var result = assetsService.getAllAssets();
 
         // then
         Assertions.assertThat(result)
                 .hasSize(1)
-                .containsExactly(AssetDto.builder().amount(asset).incomeDate(now).build());
+                .containsExactly(assetDto);
     }
 
     @Test
@@ -111,6 +122,8 @@ class AssetsServiceTest {
         var assetDto = AssetDto.builder().amount(asset).incomeDate(now).build();
         var assetEntity = AssetEntity.builder().amount(asset).incomeDate(now).build();
 
+        Mockito.when(assetsRepository.save(any())).thenReturn(assetEntity);
+
         //when
         assetsService.setAsset(assetDto);
 
@@ -118,28 +131,25 @@ class AssetsServiceTest {
         Mockito.verify(assetsRepository, Mockito.times(1)).save(assetEntity);
     }
 
-    @Test
-    void shouldThrowExceptionWhenAmountInAssetDtoIsNull() {
-        //given
-        Instant now = Instant.now();
-        var assetDto = AssetDto.builder().incomeDate(now).build(); // no amount field set
-
-        //when
-        AssetIncompleteException result = assertThrows(AssetIncompleteException.class,
-                () -> assetsService.setAsset(assetDto));
-        //then
-        assertEquals(AssetValidatorEnum.NO_AMOUNT.getMessage(), result.getMessage());
-
-    }
 
     @Test
     void shouldVerifyIfTheRepositoryUpdateWasCalled() {
         //given
         BigDecimal asset = BigDecimal.ONE;
-        var entity = AssetEntity.builder().amount(asset).build();
-        var assetDto = AssetDto.builder().amount(asset).build();
+        var entity = AssetEntity.builder()
+                .id(1L)
+                .amount(asset)
+                .category(AssetCategory.BONUS)
+                .incomeDate(Instant.now())
+                .build();
+        var assetDto = AssetDto.builder()
+                .amount(asset)
+                .category(AssetCategory.BONUS)
+                .incomeDate(Instant.now())
+                .build();
 
         Mockito.when(assetsRepository.findById(any())).thenReturn(Optional.of(entity));
+        Mockito.when(assetsRepository.saveAndFlush(any())).thenReturn(entity);
         //when
 
         assetsService.updateAsset(assetDto);
@@ -149,16 +159,4 @@ class AssetsServiceTest {
         Mockito.verify(assetsRepository, Mockito.times(1)).saveAndFlush(entity);
     }
 
-    @Test
-    void shouldThrowWhenIncomeDateIsNull() {
-        //given
-        AssetDto assetDto = AssetDto.builder().amount(BigDecimal.ONE).build();
-
-        //when
-        var result = assertThrows(AssetIncompleteException.class,
-                () -> assetsService.setAsset(assetDto));
-
-        //then
-        assertEquals(AssetValidatorEnum.NO_INCOME_DATE.getMessage(), result.getMessage());
-    }
 }

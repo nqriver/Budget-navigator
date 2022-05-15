@@ -44,7 +44,7 @@ public class ExpenseServiceIntegrationTest extends IntegrationTestDatabaseInitia
         List<ExpenseDto> result = expenseService.findAllBetweenDates(from, to);
 
         // then
-        assertThat(result).hasSize(3);
+        assertThat(result).hasSize(1);
 //        List<String> resultDates = result.stream()
 //                .map(ExpenseDto::getExpenseDate)
 //                .map(e -> e.toString().substring(0, fromDate.length()))
