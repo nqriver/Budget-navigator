@@ -1,5 +1,8 @@
 package pl.nqriver.homebudget.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.nqriver.homebudget.services.ExpenseService;
 import pl.nqriver.homebudget.services.dtos.ExpenseDto;
@@ -21,6 +24,12 @@ public class ExpenseController {
         return expenseService.getAllExpenses();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ExpenseDto> getExpense(@PathVariable Long id) {
+        ExpenseDto expenseResponse = expenseService.getExpense(id);
+        return ResponseEntity.ok().body(expenseResponse);
+    }
+
     @GetMapping("/filter")
     public List<ExpenseDto> getAllExpensesBetweenDates(@RequestParam("from") String fromDate,
                                                        @RequestParam("to") String toDate) {
@@ -28,18 +37,20 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public ExpenseDto setExpense(@RequestBody ExpenseDto expenseDto) {
-        return expenseService.setExpense(expenseDto);
+    public ResponseEntity<ExpenseDto> setExpense(@RequestBody ExpenseDto expenseDto) {
+        ExpenseDto expenseResponse = expenseService.setExpense(expenseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(expenseResponse);
     }
 
     @PutMapping
-    public ExpenseDto updateExpense(@RequestBody ExpenseDto expenseDto) {
-        return expenseService.updateExpense(expenseDto);
+    public ResponseEntity<ExpenseDto> updateExpense(@PathVariable Long id, @RequestBody ExpenseDto expenseDto) {
+        return ResponseEntity.ok().body(expenseService.updateExpense(id, expenseDto));
     }
 
-    @DeleteMapping
-    public void deleteExpense(@RequestBody ExpenseDto expenseDto) {
-        expenseService.deleteExpense(expenseDto);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteExpense(@PathVariable Long id, Authentication authentication) {
+        expenseService.deleteExpense(id, authentication);
+        return ResponseEntity.noContent().build();
     }
 
 }

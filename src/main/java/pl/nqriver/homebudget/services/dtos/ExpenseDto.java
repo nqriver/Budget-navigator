@@ -5,7 +5,6 @@ import lombok.Data;
 import pl.nqriver.homebudget.enums.ExpenseCategory;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data

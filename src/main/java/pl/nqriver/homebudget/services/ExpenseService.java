@@ -1,6 +1,9 @@
 package pl.nqriver.homebudget.services;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import pl.nqriver.homebudget.exceptions.ResourceNotFoundException;
 import pl.nqriver.homebudget.mappers.ExpensesMapper;
 import pl.nqriver.homebudget.repositories.ExpenseRepository;
 import pl.nqriver.homebudget.repositories.entities.ExpenseEntity;
@@ -15,8 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
-    public static final String FROM_DATE_SUFIX = "T00:00:00";
-    public static final String TO_DATE_SUFIX = "T23:59:59";
+    public static final String FROM_DATE_SUFFIX = "T00:00:01.000";
+    public static final String TO_DATE_SUFFIX = "T23:59:59.000";
 
     private final ExpensesMapper expensesMapper;
     private final ExpenseRepository expenseRepository;
@@ -41,16 +44,24 @@ public class ExpenseService {
         return expensesMapper.fromEntityToDto(savedExpenseEntity);
     }
 
-    public void deleteExpense(ExpenseDto expenseDto) {
-        UserEntity loggedUser = userLogInfoService.getLoggedUserEntity();
-        ExpenseEntity expenseToDelete = expensesMapper.fromDtoToEntity(expenseDto, loggedUser);
-        expenseRepository.delete(expenseToDelete);
+    public void deleteExpense(Long id, Authentication authentication) {
+        ExpenseEntity expense = expenseRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        if (!isLoggedUserOwnerOfResource(authentication, expense)) {
+            throw new AccessDeniedException("User has no access to resource");
+        }
+        expenseRepository.delete(expense);
+    }
+
+    private boolean isLoggedUserOwnerOfResource(Authentication authentication, ExpenseEntity expense) {
+        return authentication.getName().equals(expense.getUser().getUsername());
     }
 
     @Transactional
-    public ExpenseDto updateExpense(ExpenseDto expenseDto) {
-        var expenseDtoId = expenseDto.getId();
-        var expenseToUpdate = expenseRepository.findById(expenseDtoId).orElseThrow();
+    public ExpenseDto updateExpense(Long id, ExpenseDto expenseDto) {
+        var expenseToUpdate = expenseRepository.findById(id)
+                .orElseThrow();
         updateExpenseProperties(expenseDto, expenseToUpdate);
         return expensesMapper.fromEntityToDto(expenseToUpdate);
     }
@@ -69,11 +80,15 @@ public class ExpenseService {
 
     public List<ExpenseDto> findAllBetweenDates(String fromDate, String toDate) {
         UserEntity loggedUserEntity = userLogInfoService.getLoggedUserEntity();
-        LocalDateTime from = LocalDateTime.parse(fromDate + FROM_DATE_SUFIX);
-        LocalDateTime to = LocalDateTime.parse(toDate + TO_DATE_SUFIX);
+        LocalDateTime from = LocalDateTime.parse(fromDate + FROM_DATE_SUFFIX);
+        LocalDateTime to = LocalDateTime.parse(toDate + TO_DATE_SUFFIX);
         return expenseRepository.getAllByUserAndExpenseDateBetween(loggedUserEntity, from, to)
                 .stream()
                 .map(expensesMapper::fromEntityToDto)
                 .collect(Collectors.toList());
+    }
+
+    public ExpenseDto getExpense(Long id) {
+        return expensesMapper.fromEntityToDto(expenseRepository.getById(id));
     }
 }

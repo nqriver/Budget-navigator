@@ -1,15 +1,16 @@
 package pl.nqriver.homebudget.services.integrations;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import pl.nqriver.homebudget.enums.ExpenseCategory;
 import pl.nqriver.homebudget.mappers.ExpensesMapper;
 import pl.nqriver.homebudget.repositories.entities.ExpenseEntity;
 import pl.nqriver.homebudget.services.dtos.ExpenseDto;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
@@ -45,12 +46,11 @@ public class ExpenseServiceIntegrationTest extends IntegrationTestDatabaseInitia
 
         // then
         assertThat(result).hasSize(1);
-//        List<String> resultDates = result.stream()
-//                .map(ExpenseDto::getExpenseDate)
-//                .map(e -> e.toString().substring(0, fromDate.length()))
-//                .collect(Collectors.toList());
-//
-//        assertThat(resultDates).hasSize(3)
+        List<LocalDateTime> resultDates = result.stream()
+                .map(ExpenseDto::getExpenseDate)
+                .collect(Collectors.toList());
+
+//        assertThat(resultDates)
 //                .containsExactly(fromDate, toDate, inRangeDate)
 //                .doesNotContain(notInRangeDate);
     }
@@ -84,9 +84,10 @@ public class ExpenseServiceIntegrationTest extends IntegrationTestDatabaseInitia
         var expense = initExpenseOfUserInDatabase(userEntity);
         var expenseToRemoveDto = expensesMapper.fromEntityToDto(expense);
         assertThat(expenseRepository.findAll()).hasSize(1);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // when
-        expenseService.deleteExpense(expenseToRemoveDto);
+        expenseService.deleteExpense(expense.getId(), authentication);
 
         //then
         assertThat(expenseRepository.findById(expense.getId())).isNotPresent();
@@ -125,7 +126,7 @@ public class ExpenseServiceIntegrationTest extends IntegrationTestDatabaseInitia
                 .build();
 
         // when
-        expenseService.updateExpense(updatedExpenseDto);
+        expenseService.updateExpense(savedExpense.getId(), updatedExpenseDto);
 
         // then
         var updatedEntity = expenseRepository.findById(savedExpense.getId()).orElseThrow();
