@@ -55,7 +55,8 @@ public class ExpenseService {
     }
 
     private boolean isLoggedUserOwnerOfResource(Authentication authentication, ExpenseEntity expense) {
-        return authentication.getName().equals(expense.getUser().getUsername());
+        return authentication.getName().equals(
+                expense.getUser().getUsername());
     }
 
     @Transactional
