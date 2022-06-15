@@ -8,19 +8,24 @@ import pl.nqriver.homebudget.enums.AssetCategory;
 import pl.nqriver.homebudget.enums.ExpenseCategory;
 import pl.nqriver.homebudget.repositories.AssetsRepository;
 import pl.nqriver.homebudget.repositories.ExpenseRepository;
+import pl.nqriver.homebudget.repositories.RecurringExpenseRepository;
 import pl.nqriver.homebudget.repositories.UserRepository;
 import pl.nqriver.homebudget.repositories.entities.AssetEntity;
 import pl.nqriver.homebudget.repositories.entities.ExpenseEntity;
+import pl.nqriver.homebudget.repositories.entities.RecurringExpenseEntity;
 import pl.nqriver.homebudget.repositories.entities.UserEntity;
 import pl.nqriver.homebudget.services.AssetsService;
 import pl.nqriver.homebudget.services.ExpenseService;
+import pl.nqriver.homebudget.services.RecurringExpenseService;
 import pl.nqriver.homebudget.services.UserDetailsServiceImpl;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
+import java.util.Properties;
 
 
 @SpringBootTest
@@ -36,16 +41,19 @@ public abstract class IntegrationTestDatabaseInitializer {
     @Autowired
     protected AssetsRepository assetsRepository;
     @Autowired
+    protected AssetsService assetsService;
+    @Autowired
     public UserRepository userRepository;
     @Autowired
     protected ExpenseService expenseService;
     @Autowired
     protected ExpenseRepository expenseRepository;
     @Autowired
-    protected AssetsService assetsService;
-    @Autowired
     protected UserDetailsServiceImpl userDetailsService;
-
+    @Autowired
+    protected RecurringExpenseRepository recurringExpenseRepository;
+    @Autowired
+    protected RecurringExpenseService recurringExpenseService;
 
 
     protected UserEntity initDefaultUserInDatabase() {
@@ -148,6 +156,17 @@ public abstract class IntegrationTestDatabaseInitializer {
                 assetEntityTwo,
                 assetEntityThree
         ));
+    }
+
+    protected void initDatabaseWithRecurringExpense(UserEntity userEntity) {
+        var entity = RecurringExpenseEntity.builder()
+                .month(Month.MAY)
+                .day(Short.MAX_VALUE)
+                .amount(BigDecimal.TEN)
+                .category(ExpenseCategory.HOUSING)
+                .user(userEntity)
+                .build();
+        recurringExpenseRepository.save(entity);
     }
 
 
