@@ -2,6 +2,7 @@ package pl.nqriver.homebudget.repositories.entities;
 
 import lombok.*;
 import pl.nqriver.homebudget.enums.ExpenseCategory;
+import pl.nqriver.homebudget.repositories.entities.converters.CustomMonthConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ public class RecurringExpenseEntity {
     private ExpenseCategory category;
 
     @Column(columnDefinition = "smallint")
-    @Enumerated
+    @Convert(converter = CustomMonthConverter.class)
     private Month month;
 
     @NotNull
