@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import pl.nqriver.homebudget.repositories.entities.AssetEntity;
 import pl.nqriver.homebudget.repositories.entities.UserEntity;
 import pl.nqriver.homebudget.services.dtos.AssetDto;
+import pl.nqriver.homebudget.services.dtos.csv.AssetCsvRecord;
 
 @Component
 public class AssetsMapper {
@@ -23,6 +24,15 @@ public class AssetsMapper {
                 .amount(assetEntity.getAmount())
                 .incomeDate(assetEntity.getIncomeDate())
                 .category(assetEntity.getCategory())
+                .build();
+    }
+
+    public AssetCsvRecord fromDtoToCsvRecord(AssetDto assetDto) {
+        return AssetCsvRecord.builder()
+                .id(assetDto.getId())
+                .amount(assetDto.getAmount())
+                .incomeDate(assetDto.getIncomeDate())
+                .category(assetDto.getCategory())
                 .build();
     }
 }

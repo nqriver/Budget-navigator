@@ -1,46 +1,48 @@
 package pl.nqriver.homebudget.services;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Service;
-import pl.nqriver.homebudget.exceptions.ReportGenerationException;
+import pl.nqriver.homebudget.mappers.AssetsMapper;
+import pl.nqriver.homebudget.mappers.ExpensesMapper;
 import pl.nqriver.homebudget.services.dtos.AssetDto;
+import pl.nqriver.homebudget.services.dtos.ExpenseDto;
+import pl.nqriver.homebudget.services.dtos.csv.AssetCsvRecord;
+import pl.nqriver.homebudget.services.dtos.csv.ExpenseCsvRecord;
 
 import java.io.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FinancialReportExportService {
     private final AssetsService assetsService;
+    private final ExpenseService expenseService;
+    private final CsvReportService csvReportService;
+    private final AssetsMapper assetsMapper;
+    private final ExpensesMapper expenseMapper;
 
-    public FinancialReportExportService(AssetsService assetsService) {
+    public FinancialReportExportService(AssetsService assetsService,
+                                        ExpenseService expenseService,
+                                        CsvReportService csvReportService,
+                                        AssetsMapper assetsMapper,
+                                        ExpensesMapper expenseMapper) {
         this.assetsService = assetsService;
+        this.expenseService = expenseService;
+        this.csvReportService = csvReportService;
+        this.assetsMapper = assetsMapper;
+        this.expenseMapper = expenseMapper;
     }
 
-    public ByteArrayInputStream writeAssetsAuditToCsv() {
-
+    public ByteArrayInputStream writeAssetsReportToCsv() {
         List<AssetDto> allAssets = assetsService.getAllAssets();
-        CSVFormat format = CSVFormat.Builder
-                .create()
-                .setHeader()
-                .setDelimiter(';')
-                .build();
-        try (
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                CSVPrinter csvPrinter = new CSVPrinter(new PrintWriter(out), format)
-        ) {
-            for (AssetDto assetDto : allAssets) {
-                csvPrinter.printRecord(
-                        assetDto.getId(),
-                        assetDto.getIncomeDate(),
-                        assetDto.getCategory(),
-                        assetDto.getAmount()
-                );
-            }
-            csvPrinter.flush();
-            return new ByteArrayInputStream(out.toByteArray());
-        } catch (IOException exception) {
-            throw new ReportGenerationException("Failed to export income data to csv file\n" + exception.getMessage());
-        }
+        List<AssetCsvRecord> allAssetCsvRecords = allAssets.stream().map(assetsMapper::fromDtoToCsvRecord)
+                .collect(Collectors.toList());
+        return csvReportService.writeAsCsv(allAssetCsvRecords);
+    }
+
+    public ByteArrayInputStream writeExpenseReportToCsv() {
+        List<ExpenseDto> allExpenses = expenseService.getAllExpenses();
+        List<ExpenseCsvRecord> allExpensesCsvRecords = allExpenses.stream().map(expenseMapper::fromDtoToCsvRecord)
+                .collect(Collectors.toList());
+        return csvReportService.writeAsCsv(allExpensesCsvRecords);
     }
 }

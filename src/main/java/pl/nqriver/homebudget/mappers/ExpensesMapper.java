@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import pl.nqriver.homebudget.repositories.entities.ExpenseEntity;
 import pl.nqriver.homebudget.repositories.entities.UserEntity;
 import pl.nqriver.homebudget.services.dtos.ExpenseDto;
+import pl.nqriver.homebudget.services.dtos.csv.ExpenseCsvRecord;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,15 @@ public class ExpensesMapper {
                 .amount(expenseEntity.getAmount())
                 .expenseDate(expenseEntity.getExpenseDate())
                 .category(expenseEntity.getCategory())
+                .build();
+    }
+
+    public ExpenseCsvRecord fromDtoToCsvRecord(ExpenseDto expenseDto) {
+        return ExpenseCsvRecord.builder()
+                .id(expenseDto.getId())
+                .amount(expenseDto.getAmount())
+                .expenseDate(expenseDto.getExpenseDate())
+                .category(expenseDto.getCategory())
                 .build();
     }
 

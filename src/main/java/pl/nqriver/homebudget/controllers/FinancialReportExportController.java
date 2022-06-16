@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.nqriver.homebudget.services.FinancialReportExportService;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 @RestController
 public class FinancialReportExportController {
     private final FinancialReportExportService reportExportService;
@@ -19,11 +16,20 @@ public class FinancialReportExportController {
         this.reportExportService = reportExportService;
     }
 
-    @RequestMapping(path = "/assets/report", produces = "text/csv")
-    public ResponseEntity<InputStreamResource> getAssetsReport(HttpServletResponse response) throws IOException {
+    @RequestMapping("/assets/report")
+    public ResponseEntity<InputStreamResource> getAssetsReport() {
         String filename = "assets.csv";
         InputStreamResource file =
-                new InputStreamResource(reportExportService.writeAssetsAuditToCsv());
+                new InputStreamResource(reportExportService.writeAssetsReportToCsv());
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("application/csv"))
+                .body(file);
+    }
+    @RequestMapping("/expenses/report")
+    public ResponseEntity<InputStreamResource> getExpensesReport() {
+        String filename = "expenses.csv";
+        InputStreamResource file =
+                new InputStreamResource(reportExportService.writeExpenseReportToCsv());
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(MediaType.parseMediaType("application/csv"))
                 .body(file);
