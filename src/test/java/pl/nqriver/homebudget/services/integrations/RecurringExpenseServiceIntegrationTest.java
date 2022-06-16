@@ -9,6 +9,7 @@ import pl.nqriver.homebudget.services.dtos.RecurringExpenseRequest;
 import pl.nqriver.homebudget.services.dtos.RecurringExpenseResponse;
 
 import java.math.BigDecimal;
+import java.time.Month;
 import java.util.List;
 
 class RecurringExpenseServiceIntegrationTest extends IntegrationTestDatabaseInitializer {
@@ -22,7 +23,7 @@ class RecurringExpenseServiceIntegrationTest extends IntegrationTestDatabaseInit
         RecurringExpenseRequest request = RecurringExpenseRequest.builder()
                 .amount(BigDecimal.valueOf(233))
                 .category(ExpenseCategory.ENTERTAINMENTS)
-                .month((short) 12)
+                .month(Month.JANUARY)
                 .day((short) 12)
                 .build();
 
@@ -36,7 +37,7 @@ class RecurringExpenseServiceIntegrationTest extends IntegrationTestDatabaseInit
 
         Assertions.assertThat(savedEntity.getAmount()).isEqualTo(request.getAmount());
         Assertions.assertThat(savedEntity.getDay()).isEqualTo(request.getDay());
-        Assertions.assertThat(savedEntity.getMonth().getValue()).isEqualTo(request.getMonth().intValue());
+        Assertions.assertThat(savedEntity.getMonth()).isEqualTo(request.getMonth());
         Assertions.assertThat(savedEntity.getCategory()).isEqualTo(request.getCategory());
     }
 }

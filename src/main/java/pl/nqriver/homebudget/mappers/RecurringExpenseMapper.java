@@ -16,23 +16,23 @@ import java.util.stream.Collectors;
 public class RecurringExpenseMapper {
 
     public RecurringExpenseEntity fromRequestToEntity(RecurringExpenseRequest expenseDto, UserEntity user) {
-        Month monthValue = Objects.isNull(expenseDto.getMonth()) ? null : Month.of(expenseDto.getMonth());
+//        Month monthValue = Objects.isNull(expenseDto.getMonth()) ? null : Month.of(expenseDto.getMonth());
         return RecurringExpenseEntity.builder()
                 .amount(expenseDto.getAmount())
                 .category(expenseDto.getCategory())
                 .user(user)
                 .day(expenseDto.getDay())
-                .month(monthValue)
+                .month(expenseDto.getMonth())
                 .build();
     }
 
     public RecurringExpenseRequest fromEntityToDto(RecurringExpenseEntity expenseEntity) {
-        Short monthValue = Objects.isNull(expenseEntity.getMonth()) ?
-                null : (short) expenseEntity.getMonth().getValue();
+//        Short monthValue = Objects.isNull(expenseEntity.getMonth()) ?
+//                null : (short) expenseEntity.getMonth().getValue();
         return RecurringExpenseRequest.builder()
                 .amount(expenseEntity.getAmount())
                 .day(expenseEntity.getDay())
-                .month(monthValue)
+                .month(expenseEntity.getMonth())
                 .category(expenseEntity.getCategory())
                 .build();
     }
