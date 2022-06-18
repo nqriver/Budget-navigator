@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Data;
 import pl.nqriver.homebudget.enums.ExpenseCategory;
+import pl.nqriver.homebudget.validators.annotiations.ExistingExpenseCategory;
 
 import javax.persistence.Enumerated;
 import javax.validation.Valid;
@@ -21,9 +22,9 @@ public class RecurringExpenseRequest {
     @Positive
     private BigDecimal amount;
 
+    @ExistingExpenseCategory
     private ExpenseCategory category;
 
-    @Valid
     private Month month;
 
     @NotNull

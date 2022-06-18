@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import pl.nqriver.homebudget.enums.AssetCategory;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -11,9 +12,13 @@ import java.util.List;
 @Builder
 @Data
 public class AssetCsvRecord implements CsvRecord {
+    @NotNull
     private Long id;
+    @NotNull
     private BigDecimal amount;
+    @NotNull
     private Instant incomeDate;
+    @NotNull
     private AssetCategory category;
 
     @Override
