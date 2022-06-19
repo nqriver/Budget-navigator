@@ -1,4 +1,4 @@
-# Home budget
+# Budget navigator
 
 ## Table of contents
 
