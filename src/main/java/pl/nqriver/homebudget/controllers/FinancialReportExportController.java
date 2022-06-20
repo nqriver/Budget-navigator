@@ -5,8 +5,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.nqriver.homebudget.services.FinancialReportExportService;
+
+import java.io.ByteArrayInputStream;
 
 @RestController
 public class FinancialReportExportController {
@@ -30,6 +33,17 @@ public class FinancialReportExportController {
         String filename = "expenses.csv";
         InputStreamResource file =
                 new InputStreamResource(reportExportService.writeExpenseReportToCsv());
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("application/csv"))
+                .body(file);
+    }
+
+    @RequestMapping("/expenses/recurring/report")
+    public ResponseEntity<InputStreamResource> getMonthlyRecurringExpensesReport() {
+        String filename = "recurring_expenses.csv";
+        ByteArrayInputStream stream = reportExportService.reportMonthlyRecurringExpenses();
+        InputStreamResource file =
+                new InputStreamResource(stream);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(MediaType.parseMediaType("application/csv"))
                 .body(file);

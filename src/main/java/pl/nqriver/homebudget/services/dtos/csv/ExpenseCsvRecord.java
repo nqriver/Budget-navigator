@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class ExpenseCsvRecord implements CsvRecord{
+public class ExpenseCsvRecord extends CsvRecord{
     @NotNull
     private Long id;
     @NotNull

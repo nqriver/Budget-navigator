@@ -2,32 +2,34 @@ package pl.nqriver.homebudget.services.dtos.csv;
 
 import lombok.Builder;
 import lombok.Data;
-import pl.nqriver.homebudget.enums.AssetCategory;
+import pl.nqriver.homebudget.enums.ExpenseCategory;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 
 @Builder
 @Data
-public class AssetCsvRecord extends CsvRecord {
+public class RecurringExpenseCsvRecord extends CsvRecord {
     @NotNull
     private Long id;
     @NotNull
     private BigDecimal amount;
     @NotNull
-    private Instant incomeDate;
+    private ExpenseCategory category;
     @NotNull
-    private AssetCategory category;
+    private Short month;
+    @NotNull
+    private Short day;
 
     @Override
     public List<String> getPropertiesAsList() {
         return List.of(
                 id.toString(),
                 amount.toString(),
-                incomeDate.toString(),
-                category.toString()
+                category.name(),
+                month.toString(),
+                day.toString()
         );
     }
 
@@ -36,8 +38,9 @@ public class AssetCsvRecord extends CsvRecord {
         return List.of(
                 "ID",
                 "AMOUNT",
-                "INCOME DATE",
-                "CATEGORY"
+                "CATEGORY",
+                "MONTH",
+                "DAY"
         );
     }
 }
