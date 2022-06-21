@@ -7,6 +7,7 @@ import pl.nqriver.homebudget.enums.ExpenseCategory;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Builder
 @Data
@@ -17,7 +18,7 @@ public class RecurringExpenseCsvRecord extends CsvRecord {
     private BigDecimal amount;
     @NotNull
     private ExpenseCategory category;
-    @NotNull
+
     private Short month;
     @NotNull
     private Short day;
@@ -28,7 +29,7 @@ public class RecurringExpenseCsvRecord extends CsvRecord {
                 id.toString(),
                 amount.toString(),
                 category.name(),
-                month.toString(),
+                Objects.isNull(month) ? "" : month.toString(),
                 day.toString()
         );
     }

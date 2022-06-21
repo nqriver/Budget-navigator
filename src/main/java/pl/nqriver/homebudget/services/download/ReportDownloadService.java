@@ -1,33 +1,34 @@
-package pl.nqriver.homebudget.services;
+package pl.nqriver.homebudget.services.download;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.nqriver.homebudget.enums.RecurringExpensePaymentPeriod;
 import pl.nqriver.homebudget.mappers.AssetsMapper;
 import pl.nqriver.homebudget.mappers.ExpensesMapper;
-import pl.nqriver.homebudget.mappers.RecurringExpenseMapper;
-import pl.nqriver.homebudget.mappers.RecurringExpenseToCsvMapper;
+import pl.nqriver.homebudget.services.AssetsService;
+import pl.nqriver.homebudget.services.CsvReportService;
+import pl.nqriver.homebudget.services.ExpenseService;
 import pl.nqriver.homebudget.services.dtos.AssetDto;
 import pl.nqriver.homebudget.services.dtos.ExpenseDto;
-import pl.nqriver.homebudget.services.dtos.RecurringExpenseResponse;
 import pl.nqriver.homebudget.services.dtos.csv.AssetCsvRecord;
 import pl.nqriver.homebudget.services.dtos.csv.ExpenseCsvRecord;
 import pl.nqriver.homebudget.services.dtos.csv.RecurringExpenseCsvRecord;
+import pl.nqriver.homebudget.services.download.RecurringExpenseReportStrategy;
+import pl.nqriver.homebudget.services.download.RecurringExpenseReportHandlerRegistry;
 
 import java.io.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class FinancialReportExportService {
+public class ReportDownloadService {
     private final AssetsService assetsService;
     private final ExpenseService expenseService;
     private final CsvReportService csvReportService;
-    private final RecurringExpenseToCsvMapper recurringExpenseMapper;
-    private final RecurringExpenseService recurringExpenseService;
     private final AssetsMapper assetsMapper;
     private final ExpensesMapper expenseMapper;
+    private final RecurringExpenseReportHandlerRegistry recurringExpenseReportHandlerRegistry;
 
 
     public ByteArrayInputStream writeAssetsReportToCsv() {
@@ -44,24 +45,12 @@ public class FinancialReportExportService {
         return csvReportService.writeAsCsv(allExpensesCsvRecords);
     }
 
-    public ByteArrayInputStream reportMonthlyRecurringExpenses() {
-        List<RecurringExpenseResponse> allExpenses = recurringExpenseService.getAllRecurringExpenses();
-        List<RecurringExpenseCsvRecord> allExpensesCsvRecords =
-                allExpenses
-                        .stream()
-                        .filter(e -> Objects.nonNull(e.getMonth()))
-                        .map(recurringExpenseMapper::responseToCsvRecord)
-                        .collect(Collectors.toList());
-        return csvReportService.writeAsCsv(allExpensesCsvRecords);
-    }
-    public ByteArrayInputStream reportAnnualRecurringExpenses() {
-        List<RecurringExpenseResponse> allExpenses = recurringExpenseService.getAllRecurringExpenses();
-        List<RecurringExpenseCsvRecord> allExpensesCsvRecords =
-                allExpenses
-                        .stream()
-                        .filter(e -> Objects.isNull(e.getMonth()))
-                        .map(recurringExpenseMapper::responseToCsvRecord)
-                        .collect(Collectors.toList());
-        return csvReportService.writeAsCsv(allExpensesCsvRecords);
+    public ByteArrayInputStream reportRecurringExpenses(RecurringExpensePaymentPeriod period) {
+        RecurringExpenseReportStrategy reportStrategy =
+                recurringExpenseReportHandlerRegistry
+                        .getReportFor(period)
+                        .orElseThrow(() -> new IllegalArgumentException("Unknown period type"));
+        List<RecurringExpenseCsvRecord> report = reportStrategy.report();
+        return csvReportService.writeAsCsv(report);
     }
 }
